@@ -1,0 +1,129 @@
+{% extends 'myapp/parking.html' %}
+{% load static %}
+
+{%block cssa%}
+{% comment %} this css for only image predict and detect field {% endcomment %}
+
+.grid-image img {
+    width: 300px;
+    height: 241px;
+    border-radius: 8px;
+    display: block; /* Ensure image is centered */
+    margin: 0 auto; /* Center image horizontally */
+    object-fit: cover;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+
+}
+
+.grid-container {
+    background-color: white;
+    border-radius: 10px;
+    padding: 16px;
+    font-weight: 700;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+    /* max-width: 46%; */
+    width: 45%;
+    overflow: auto;
+    margin: 1px auto 0;
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: 250px 74px;
+    gap: 20px;
+    align-items: center;
+    justify-content: center;
+}
+.button-container {
+    display: flex; /* Use flexbox for button alignment */
+    justify-content: center; /* Center buttons horizontally */
+    gap: 10px; /* Adjust as needed */
+}
+
+.button-container form {
+    margin: 7px; /* Remove default form margin */
+}
+
+.button-container button {
+    padding: 10px 20px;
+    font-size: 16px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease-in;
+}
+
+.btn-danger {
+    background-color: red;
+    color: white;
+}
+
+.btn-success {
+    background-color: green;
+    color: white;
+}
+
+.btn-danger:hover {
+    background-color: darkred;
+}
+.btn-success:hover {
+    background-color: darkgreen;
+}
+
+{%endblock%}
+{% block tasbir %} 
+    {% if user.tasbir %}
+        <div class="grid-container">
+            <div class="grid-image">
+                <img src="{{ request.user.tasbir.tasbir.url }}" alt="User Photo">
+            </div>
+            <div class="button-container">
+                <form method="POST" action="{% url 'delete_photo' %}" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <button type="submit" name="delete_photo" class="btn-danger">Delete image</button>
+                </form>
+                <form method="POST" action="{% url 'predict_photo' %}" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <button type="submit" name="predict_photo" class="btn-success">Predict image</button>
+                </form>
+            </div>
+            
+        </div>
+    
+    {% else %}
+
+        {% if error_message %}
+            <div class="alert alert-danger" role="alert">
+                {{ error_message }}
+            </div>
+        {% endif %}    
+        <div class="container mt-5">
+            <div class="row justify-content-center">
+                <div class="col-md-6">
+                    <div class="d-flex flex-column align-items-center">
+                        <form id="uploadForm" method="POST" action="{% url 'upload_photo' %}" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            {% if tasbir_form %}
+                                <div class="form-group">
+                                    <label for="id_tasbir" class="tasbir-label">Tasbir:</label>
+                                    <input type="file" name="tasbir" id="id_tasbir" class="form-control" placeholder="Custom Placeholder Text">
+                                </div>
+                                <button type="submit" name="upload_photo" class="btn btn-success mb-3">Upload Photo</button>
+                                {% comment %} <button type="submit" name="upload_photo" class="btn btn-success mb-3">capture Photo</button> {% endcomment %}
+                                <a href="{% url 'webcam' %}" class="btn btn-success mb-3">capture image</a>
+
+                            {% endif %}
+                        </form>                     
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+<script>
+document.getElementById("uploadForm").addEventListener("submit", function(event) {
+    var inputFile = document.getElementById("id_tasbir");
+    if (inputFile.files.length === 0) {
+        alert("Please select an image before uploading.");
+        event.preventDefault();
+    }
+});
+</script>
+{% endblock %}
